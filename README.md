@@ -1,16 +1,30 @@
 # OKX-Withdrawal
-*Скрипт массовой рассылки токенов по кошелькам*
 
-**Установка**
+ [💎My Profile💎](https://github.com/ryu666zaki/) | [🍩Donate🍩](https://debank.com/hi/0x2Dbc75d49a47Cdf36A3C63f8802Dcc0F3766b386) | [🗄My projects🗄](https://github.com/ryu666zaki?tab=repositories) 
+
+![](image/okx.webp)
+
+### <sub>OKX Withdraw on list of wallets</sub>
+
+### <sup>***❗You need to have Python 3.10+ installed❗***</sup>
+
+  1. Add wallets to a whitelist on OKX
+  2. Transfer assets to trading-account
+  3. **Clone repository** to yours system.
+
+> To do this, open your development environment, such as VSCode or Pycharm. Select the option to clone repo by link and paste the link to this repo.
+
+  4. Open terminal in the same folder as main.py and run this commands:
 
 ```
- 1. Добавляем кошельки в Whitelist на вывод.
- 2. Переводим баланс с funding-аккаунта на trading-аккаунт.
- 3. git clone https://github.com/xScr3amox/OKX-Withdrawal.git
- 4. cd OKX-Withdrawal
- 5. python3.10 -m venv .venv
- 6. source .venv/bin/activate
- 7. pip install ccxt
- 8. python main.py
- 9. Следуем дальнейшим инструкциям в консоли.
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install ccxt
 ```
+  5. Now you're ready to start:
+  ```
+  python main.py
+  ```
+  6. Follow the instructions in console.
+  
+ 🍩**Donate**: `0x2Dbc75d49a47Cdf36A3C63f8802Dcc0F3766b386`
