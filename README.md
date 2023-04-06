@@ -1,6 +1,6 @@
 # OKX-Withdrawal
 
- [💎My Profile💎](https://github.com/ryu666zaki/) | [🍩Donate🍩](https://debank.com/hi/0x2Dbc75d49a47Cdf36A3C63f8802Dcc0F3766b386) | [🗄My projects🗄](https://github.com/ryu666zaki?tab=repositories) 
+ [💎My Profile💎](https://github.com/ryu666zaki/) | [🍩Donate🍩](https://debank.com/hi/0x27512edc51cAd8a5277090183858677915CC95c4) | [🗄My projects🗄](https://github.com/ryu666zaki?tab=repositories) 
 
 ![](image/OKX.png)
 
@@ -27,4 +27,4 @@ pip install ccxt
   ```
   6. Follow the instructions in console.
   
- 🍩**Donate**: `0x2Dbc75d49a47Cdf36A3C63f8802Dcc0F3766b386`
+ 🍩**Donate**: `0x27512edc51cAd8a5277090183858677915CC95c4`
