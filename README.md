@@ -2,7 +2,7 @@
 
  [💎My Profile💎](https://github.com/ryu666zaki/) | [🍩Donate🍩](https://debank.com/hi/0x2Dbc75d49a47Cdf36A3C63f8802Dcc0F3766b386) | [🗄My projects🗄](https://github.com/ryu666zaki?tab=repositories) 
 
-![](image/okx.webp)
+![](image/okx.png)
 
 ### <sub>OKX Withdraw on list of wallets</sub>
 
