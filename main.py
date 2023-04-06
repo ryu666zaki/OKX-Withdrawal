@@ -18,14 +18,14 @@ def calculate_withdrawable_amount(amount, fee, balance):
     return round(amount, 7)
 
 
-print("Важно: для работы скрипта убедитесь, что баланс токена находится на spot-аккаунте, а не на funding-аккаунте.")
-input("Нажмите Enter, чтобы продолжить...")
+print("Important: for the script to work, make sure that the balance of the token is on the trading account")
+input("Press Enter to continue...")
 
-api_key = input("Введите API-ключ: ")
-secret = input("Введите секретный ключ: ")
-passphrase = input("Введите кодовую фразу: ")
+api_key = input("Enter Api-key: ")
+secret = input("Enter Secret: ")
+passphrase = input("Enter Passphrase: ")
 
-symbol = input("Введите название токена: ")
+symbol = input("Token to Withdraw: ")
 
 exchange = ccxt.okx({
     'apiKey': api_key,
@@ -36,24 +36,24 @@ exchange = ccxt.okx({
 
 info = exchange.fetch_currencies()
 available_networks = info[symbol]['networks'].keys()
-print(f"Доступные сети для {symbol}: {', '.join(available_networks)}")
-selected_network = input("Введите выбранную сеть: ")
+print(f"Available networks for {symbol}: {', '.join(available_networks)}")
+selected_network = input("Choose network: ")
 chainName = info[symbol]['networks'][selected_network]['id']
 network_fee = info[symbol]['networks'][selected_network]['fee']
 
 wallets_input = input(
-    "Введите список кошельков и суммы вывода через запятую (например, кошелек1:сумма1,кошелек2:сумма2): ")
+    "Enter addresses and amounts (e.g wallet1:amount1,wallet2:amount2, ...): ")
 wallets = [tuple(wallet.split(':')) for wallet in wallets_input.split(',')]
 
-min_delay = float(input("Введите минимальную задержку между выводами (в секундах): "))
-max_delay = float(input("Введите максимальную задержку между выводами (в секундах): "))
+min_delay = float(input("Min delay (seconds): "))
+max_delay = float(input("Max delay (seconds): "))
 
 balance = get_balance(exchange, symbol)
 
 if balance is None:
     print(
-        "Такого токена у вас на балансе не найдено. Убедитесь, что вы верно ввели название токена и что баланс токена на спот-аккаунте.")
-    symbol = input("Введите название токена еще раз: ")
+        "No such token was found on your balance. Make sure you entered the correct name of the token and that the balance of the token is on the trading-account.")
+    symbol = input("Enter token to withdraw again: ")
     balance = get_balance(exchange, symbol)
 else:
     for wallet, amount_str in wallets:
@@ -62,10 +62,10 @@ else:
         withdrawable_amount = calculate_withdrawable_amount(amount, network_fee, balance)
 
         if withdrawable_amount != amount:
-            print(f"Недостаточно средств для вывода {amount} {symbol} на адрес {wallet}.")
-            print(f"Максимально возможная сумма к выводу: {withdrawable_amount} {symbol}.")
+            print(f"Insufficient funds to withdraw {amount} {symbol} to address {wallet}.")
+            print(f"Max amount to withdraw : {withdrawable_amount} {symbol}.")
             while True:
-                user_choice = input("Введите новую сумму для вывода или 'yes' для вывода предложенной суммы: ").lower()
+                user_choice = input("Enter a new amount to withdraw or 'yes' to withdraw the proposed max amount: ").lower()
                 if user_choice == 'yes':
                     amount = withdrawable_amount
                     break
@@ -76,17 +76,17 @@ else:
                         break
                     else:
                         print(
-                            f"Введенная сумма все еще превышает доступный баланс."
-                            f" Максимально возможная сумма к выводу: {withdrawable_amount} {symbol}.")
+                            f" The entered amount still exceeds the available balance."
+                            f" Max amount to withdraw : {withdrawable_amount} {symbol}.")
 
-        print(f"Вывод {amount} {symbol} на адрес {wallet}")
+        print(f"Withdraw {amount} {symbol} to wallet {wallet}")
 
         try:
             result = exchange.withdraw(symbol, amount, wallet, params={'toAddress': wallet, 'chainName': chainName, 'dest': 4, 'fee': network_fee, 'pwd': '-', 'amt': str(amount)})
-            print("Вывод успешно выполнен")
+            print("Successful withdrawal")
             print(result)
         except Exception as e:
-            print("Ошибка при выводе")
+            print("Withdraw error")
             print(e)
 
         delay = random.uniform(min_delay, max_delay)
