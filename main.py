@@ -2,93 +2,66 @@ import ccxt
 import time
 import random
 
+API_KEY = 'api_key'  # Enter api_key
+SECRET = 'secret'  # Enter secret
+PASSPHRASE = 'passphrase'  # Enter passphrase
 
-def get_balance(exchange, symbol):
-    try:
-        balance = exchange.fetch_balance()
-        return balance['total'][symbol.upper()]
-    except KeyError:
-        return None
+TOKEN = 'USDC'  # Enter token => 'ETH', 'BNB', 'AVAX', 'USDC', 'USDT', etc.
+NETWORK = 'Polygon'  # Enter network => 'Arbitrum one', 'Polygon', 'ERC20', 'zkSync Lite', 'Optimism', 'BSC', 'TRC20', 'Avalanche C-Chain', etc.
+AMOUNT = round(random.uniform(1.0, 1.5), 6)  # 10 - min amount, 20 - max amount, 6 - digits after . (eg. 10.647293) => enter your min and max
 
-
-def calculate_withdrawable_amount(amount, fee, balance):
-    total_withdraw = amount + fee
-    if balance < total_withdraw:
-        return round((balance - fee) / 10) * 10, 7
-    return round(amount, 7)
-
-
-print("Important: for the script to work, make sure that the balance of the token is on the trading account")
-input("Press Enter to continue...")
-
-api_key = input("Enter Api-key: ")
-secret = input("Enter Secret: ")
-passphrase = input("Enter Passphrase: ")
-
-symbol = input("Token to Withdraw: ")
+MIN_DELAY = 20  # Min seconds for delay between withdraws
+MAX_DELAY = 50  # Max seconds for delay between withdraws
 
 exchange = ccxt.okx({
-    'apiKey': api_key,
-    'secret': secret,
-    'password': passphrase,
-    'enableRateLimit': True,
-})
+        'apiKey': API_KEY,
+        'secret': SECRET,
+        'password': PASSPHRASE,
+        'enableRateLimit': True,
+    })
 
-info = exchange.fetch_currencies()
-available_networks = info[symbol]['networks'].keys()
-print(f"Available networks for {symbol}: {', '.join(available_networks)}")
-selected_network = input("Choose network: ")
-chainName = info[symbol]['networks'][selected_network]['id']
-network_fee = info[symbol]['networks'][selected_network]['fee']
 
-wallets_input = input(
-    "Enter addresses and amounts (e.g wallet1:amount1,wallet2:amount2, ...): ")
-wallets = [tuple(wallet.split(':')) for wallet in wallets_input.split(',')]
+def token_fee(token, network):
+    info = exchange.fetch_currencies()
+    network_fee = info[token]['networks'][network]['fee']
+    return network_fee
 
-min_delay = float(input("Min delay (seconds): "))
-max_delay = float(input("Max delay (seconds): "))
 
-balance = get_balance(exchange, symbol)
+def withdraw_info(value, wallet, token, amount, network):
+    if value == 'success':
+        result = f"**** Succesfull withdrawal {amount} {token} to {wallet} on {network} network ****"
+        return result
+    elif value == 'error':
+        result = f"**** Withdrawal error ****"
+        return result
 
-if balance is None:
-    print(
-        "No such token was found on your balance. Make sure you entered the correct name of the token and that the balance of the token is on the trading-account.")
-    symbol = input("Enter token to withdraw again: ")
-    balance = get_balance(exchange, symbol)
-else:
-    for wallet, amount_str in wallets:
-        amount = float(amount_str)
-        balance = get_balance(exchange, symbol)
-        withdrawable_amount = calculate_withdrawable_amount(amount, network_fee, balance)
 
-        if withdrawable_amount != amount:
-            print(f"Insufficient funds to withdraw {amount} {symbol} to address {wallet}.")
-            print(f"Max amount to withdraw : {withdrawable_amount} {symbol}.")
-            while True:
-                user_choice = input("Enter a new amount to withdraw or 'yes' to withdraw the proposed max amount: ").lower()
-                if user_choice == 'yes':
-                    amount = withdrawable_amount
-                    break
-                else:
-                    new_amount = float(user_choice)
-                    if new_amount <= withdrawable_amount:
-                        amount = new_amount
-                        break
-                    else:
-                        print(
-                            f" The entered amount still exceeds the available balance."
-                            f" Max amount to withdraw : {withdrawable_amount} {symbol}.")
+def withdraw(token, network, amount, wallet):
+    network_fee = token_fee(token, network)
+    try:
+        exchange.withdraw(token, amount, wallet, params={
+            'toAddress': wallet,
+            'chainName': network,
+            'dest': 4,
+            'fee': network_fee,
+            'pwd': '-',
+            'amt': amount,
+            'network': network
+        })
 
-        print(f"Withdraw {amount} {symbol} to wallet {wallet}")
+        print(withdraw_info('success', wallet, token, amount, network))
+    except Exception:
+        print(withdraw_info('error', wallet, token, amount, network))
 
-        try:
-            result = exchange.withdraw(symbol, amount, wallet, params={'toAddress': wallet, 'chainName': chainName, 'dest': 4, 'fee': network_fee, 'pwd': '-', 'amt': str(amount)})
-            print("Successful withdrawal")
-            print(result)
-        except Exception as e:
-            print("Withdraw error")
-            print(e)
 
-        delay = random.uniform(min_delay, max_delay)
+def main():
+    with open('wallets.txt', 'r') as f:
+        wallets_list = [row.strip() for row in f]
+    for wallet in wallets_list:
+        withdraw(TOKEN, NETWORK, AMOUNT, wallet)
+        delay = random.uniform(MIN_DELAY, MAX_DELAY)
         time.sleep(delay)
 
+
+if __name__ == '__main__':
+    main()
